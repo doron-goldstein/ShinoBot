@@ -178,6 +178,6 @@ async def on_ready():
     #         discord.opus.load_opus(opus)
     #     except:
     #         print(f"opus {opus} has failed")
-    discord.opus.load("libopus.so.0.5.3")
+    discord.opus.load_opus("libopus.so.0.5.3")
 bot.add_cog(Music(bot))
 bot.run(token)
