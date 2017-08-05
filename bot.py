@@ -172,6 +172,11 @@ bot = commands.Bot(command_prefix=commands.when_mentioned_or("m!"),
 async def on_ready():
     print('Logged in as {0.id}/{0}'.format(bot.user))
     print('------')
-
+    #../app/.heroku/vendor/lib
+    for opus in ["libopus.la", "libopus.so", "libopus.so.0", "libopus.so.0.5.3"]:
+        try:
+            discord.opus.load_opus(opus)
+        except:
+            print(f"opus {opus} has failed")
 bot.add_cog(Music(bot))
 bot.run(token)
