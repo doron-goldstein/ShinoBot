@@ -68,11 +68,18 @@ class VoiceState:
         self.queue = asyncio.Queue()
         self.current = None
         self.play_next_song = asyncio.Event()
+        self.skips = []
         self.pl_task = self.bot.loop.create_task(self.playlist())
+
+    def skip_song(self):
+        if len(self.skips) >= (len(self.current.ctx.voice_client.channel.members) - 1)*0.34:
+            self.current.ctx.voice_client.stop()
+            self.toggle_song(None)
 
     def toggle_song(self, error):
         if error:
             print(error)
+        self.skips = []
         self.bot.loop.call_soon_threadsafe(self.play_next_song.set)
 
     async def playlist(self):
@@ -108,23 +115,6 @@ class Music:
             return await ctx.voice_client.move_to(channel)
         await channel.connect()
 
-    @commands.command(name="local", hidden=True)
-    async def _local(self, ctx, *, query):
-        """Plays a file from the local filesystem"""
-
-        if ctx.voice_client is None:
-            if ctx.author.voice.channel:
-                await ctx.author.voice.channel.connect()
-            else:
-                return await ctx.send("Not connected to a voice channel.")
-
-        if ctx.voice_client.is_playing():
-            ctx.voice_client.stop()
-
-        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(query))
-        ctx.voice_client.play(source, after=lambda e: print('Player error: %s' % e) if e else self.toggle_song())
-        await ctx.send('Now playing: {}'.format(query))
-
     @commands.command()
     async def play(self, ctx, *, query):
         """Streams from a query (almost anything youtube_dl supports)"""
@@ -138,6 +128,24 @@ class Music:
         song = Song(ctx, player)
         await state.queue.put(song)
         await ctx.send(f'Enqueued:\n     {player.title}')
+
+    @commands.command(aliases=["np"])
+    async def playing(self, ctx):
+        """Shows the currently playing song"""
+        state = self.get_state(ctx.guild.id)
+        embed = discord.Embed(title=state.current.ctx.author.name, description=state.current.player.title)
+        await ctx.send(embed=embed)
+    
+    @commands.command()
+    async def skip(self, ctx):
+        """Votes to skip the current song"""
+        state = self.get_state(ctx.guild.id)
+        if ctx.author.id in state.skips:
+            await ctx.send("You've voted already!")
+        else:
+            state.skips.append(ctx.author.id)
+            await ctx.send("Added vote to skip the song")
+            state.skip_song()
 
     @commands.command()
     async def queue(self, ctx):
