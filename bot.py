@@ -173,19 +173,13 @@ class Music:
         await ctx.voice_client.disconnect()
 
 
-bot = commands.Bot(command_prefix=commands.when_mentioned_or("m!"),
+bot = commands.Bot(command_prefix="m!",
                    description='Simple Music Bot')
 
 @bot.event
 async def on_ready():
     print('Logged in as {0.id}/{0}'.format(bot.user))
     print('------')
-    #../app/.heroku/vendor/lib
-    # for opus in ["libopus.la", "libopus.so", "libopus.so.0", "libopus.so.0.5.3"]:
-    #     try:
-    #         discord.opus.load_opus(opus)
-    #     except:
-    #         print(f"opus {opus} has failed")
     discord.opus.load_opus("libopus.so.0.5.3")
 bot.add_cog(Music(bot))
 bot.run(token)
