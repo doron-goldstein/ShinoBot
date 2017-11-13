@@ -108,9 +108,15 @@ class Music:
         return state
 
     @commands.command()
+    async def summon(self, ctx):
+        """Joins the channel you're currently in"""
+        if ctx.author.voice:
+            return await ctx.voice_client.move_to(ctx.author.voice.channel)
+        await ctx.send(":exclamation: You're not connected to a voice channel!")
+    
+    @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel):
         """Joins a voice channel"""
-
         if ctx.voice_client is not None:
             return await ctx.voice_client.move_to(channel)
         await channel.connect()
