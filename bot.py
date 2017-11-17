@@ -189,7 +189,7 @@ class Music:
         await ctx.send("<:blobstop:340118614848045076>")
         state = self.get_state(ctx.guild.id)
         if not state.queue.empty():
-            for i in state.queue.qsize():
+            for _ in range(state.queue.qsize()):
                 state.queue.get_nowait()
         await ctx.voice_client.disconnect()
 
