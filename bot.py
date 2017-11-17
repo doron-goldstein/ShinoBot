@@ -187,6 +187,10 @@ class Music:
     async def stop(self, ctx):
         """Stops and disconnects the bot from voice"""
         await ctx.send("<:blobstop:340118614848045076>")
+        state = self.get_state(ctx.guild.id)
+        if not state.queue.empty():
+            for i in state.queue.qsize:
+                state.queue.get_nowait()
         await ctx.voice_client.disconnect()
 
 
