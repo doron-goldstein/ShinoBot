@@ -1,10 +1,10 @@
 # SynBot - Music Bot
-This is the music section of [SynBot](https://github.com/BlackSynder/SynBot)
+This is a simple music bot.
 
-Can be run alone by creating a `config.json` file with the following:
-```python
+Can be run by creating a `config.json` file with the following:
+```json
 {
     "token": "ENTER BOT TOKEN HERE"
 }
 ```
-And running `bot.py`.
+And running `python bot.py`.
