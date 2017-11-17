@@ -85,12 +85,16 @@ class VoiceState:
     async def playlist(self):
         await self.bot.wait_until_ready()
         while not self.bot.is_closed():
+            await self.current.ctx.bot.change_presence()
             self.play_next_song.clear()
             self.current = await self.queue.get()
             self.current.ctx.voice_client.play(self.current.player, after=self.toggle_song)
             embed = discord.Embed(title="Now playing")
             embed.add_field(name="Queuer", value=self.current.ctx.author.name, inline=False)
             embed.add_field(name="Song", value=self.current.player.title, inline=False)
+            if not self.current.ctx.guild.me.game:
+                game = discord.Game(name=self.current.player.title, type=2)
+                await self.current.ctx.bot.change_presence(game=game)
             await self.current.ctx.send(embed=embed)
             await self.play_next_song.wait()
 
