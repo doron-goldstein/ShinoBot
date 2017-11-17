@@ -54,7 +54,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
     async def from_query(cls, query, *, loop=None):
         loop = loop or asyncio.get_event_loop()
         data = await loop.run_in_executor(None, ytdl.extract_info, query)
-        
+
         if 'entries' in data:
             # take first item from a playlist
             data = data['entries'][0]
@@ -113,7 +113,7 @@ class Music:
         if ctx.author.voice:
             return await ctx.voice_client.move_to(ctx.author.voice.channel)
         await ctx.send(":exclamation: You're not connected to a voice channel!")
-    
+
     @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel):
         """Joins a voice channel"""
@@ -141,7 +141,7 @@ class Music:
         state = self.get_state(ctx.guild.id)
         embed = discord.Embed(title=state.current.ctx.author.name, description=state.current.player.title)
         await ctx.send(embed=embed)
-    
+
     @commands.command()
     async def skip(self, ctx):
         """Votes to skip the current song"""
