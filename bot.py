@@ -4,6 +4,7 @@ import os
 import youtube_dl
 import discord
 from discord.ext import commands
+from utils.paginator import Pages
 
 token = os.environ.get("TOKEN")
 if token is None:
@@ -133,8 +134,10 @@ class Music:
                 await ctx.author.voice.channel.connect()
             else:
                 return await ctx.send(":exclamation: Not connected to a voice channel.")
+
         state = self.get_state(ctx.guild.id)
-        player = await YTDLSource.from_query(query, loop=self.bot.loop)
+        async with ctx.typing():
+            player = await YTDLSource.from_query(query, loop=self.bot.loop)
         song = Song(ctx, player)
         await state.queue.put(song)
         await ctx.send(f'Enqueued:\n     {player.title}')
@@ -142,8 +145,8 @@ class Music:
     @commands.command(aliases=["np"])
     async def playing(self, ctx):
         """Shows the currently playing song"""
-        state = self.get_state(ctx.guild.id)
-        embed = discord.Embed(title=state.current.ctx.author.name, description=state.current.player.title)
+        song = self.get_state(ctx.guild.id).current
+        embed = discord.Embed(title=song.ctx.author.name, description=song.player.title)
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -162,8 +165,12 @@ class Music:
         """Shows the currently queued songs"""
         state = self.get_state(ctx.guild.id)
         q = state.queue
-        msg = "\n".join([f"{song.player.title}\n    Queuer: {song.ctx.author.name}" for song in q._queue if not state.queue.empty()])
-        await ctx.send(msg)
+        if q.empty():
+            return await ctx.send("The queue is currently empty.\nYou can queue songs by typing `m!play <song name>`.")
+        queue = [f"{song.player.title}\n    By: {song.ctx.author.name}" for song in q._queue]
+        p = Pages(self.bot, message=ctx.message, entries=queue)
+        p.embed.set_author(name="Music Queue")
+        await p.paginate()
 
     @commands.command()
     async def volume(self, ctx, volume: int):
