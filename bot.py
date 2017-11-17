@@ -129,7 +129,7 @@ class Music:
     async def play(self, ctx, *, query):
         """Streams from a query (almost anything youtube_dl supports)"""
         if ctx.voice_client is None:
-            if ctx.author.voice.channel:
+            if ctx.author.voice:
                 await ctx.author.voice.channel.connect()
             else:
                 return await ctx.send(":exclamation: Not connected to a voice channel.")
