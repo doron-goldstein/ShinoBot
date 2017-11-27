@@ -1,5 +1,5 @@
 import asyncio
-import json
+import yaml
 import os
 import youtube_dl
 import discord
@@ -8,8 +8,8 @@ from utils.paginator import Pages
 
 token = os.environ.get("TOKEN")
 if token is None:
-    with open("config.json") as cfg:
-        token = json.load(cfg)["token"]
+    with open("config.yaml") as cfg:
+        token = yaml.load(cfg)["token"]
 
 # Suppress noise about console usage from errors
 youtube_dl.utils.bug_reports_message = lambda: ''
