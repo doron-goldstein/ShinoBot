@@ -203,6 +203,10 @@ bot = commands.Bot(command_prefix="m!",
 async def on_ready():
     print('Logged in as {0.id}/{0}'.format(bot.user))
     print('------')
-    discord.opus.load_opus("libopus.so.0.5.3")
+    if os.name != 'nt':
+        try:
+            discord.opus.load_opus("libopus.so.0.5.3")
+        except Exception as e:
+            print(f"Couldnt load opus:\n    {e}\nThe bot might not work.")
 bot.add_cog(Music(bot))
 bot.run(token)
