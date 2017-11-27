@@ -26,7 +26,7 @@ ytdl_format_options = {
     'quiet': True,
     'no_warnings': True,
     'default_search': 'ytsearch',
-    'source_address': '0.0.0.0' # ipv6 addresses cause issues sometimes
+    'source_address': '0.0.0.0'  # ipv6 addresses cause issues sometimes
 }
 
 ffmpeg_options = {
@@ -41,6 +41,7 @@ class Song:
     def __init__(self, ctx, player):
         self.ctx = ctx
         self.player = player
+
 
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=0.5):
@@ -63,6 +64,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         filename = ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 
+
 class VoiceState:
     def __init__(self, bot):
         self.bot = bot
@@ -73,7 +75,7 @@ class VoiceState:
         self.pl_task = self.bot.loop.create_task(self.playlist())
 
     def skip_song(self):
-        if len(self.skips) >= (len(self.current.ctx.voice_client.channel.members) - 1)*0.34:
+        if len(self.skips) >= (len(self.current.ctx.voice_client.channel.members) - 1) * 0.34:
             self.current.ctx.voice_client.stop()
             self.toggle_song(None)
 
@@ -179,9 +181,8 @@ class Music:
         if ctx.voice_client is None:
             return await ctx.send("Not connected to a voice channel.")
 
-        ctx.voice_client.source.volume = volume/100
+        ctx.voice_client.source.volume = volume / 100
         await ctx.send("Changed volume to {}%".format(volume))
-
 
     @commands.command()
     async def stop(self, ctx):
@@ -196,6 +197,7 @@ class Music:
 
 bot = commands.Bot(command_prefix="m!",
                    description='Simple Music Bot')
+
 
 @bot.event
 async def on_ready():
