@@ -64,6 +64,11 @@ class YTDLSource(discord.PCMVolumeTransformer):
         filename = ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 
+    @classmethod
+    def from_file(cls, filename):
+        data = {'title': filename}
+        return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
+
 
 class VoiceState:
     def __init__(self, bot):
@@ -129,7 +134,7 @@ class Music:
         await channel.connect()
 
     @commands.command()
-    async def play(self, ctx, *, query):
+    async def play(self, ctx, *, query=None):
         """Streams from a query (almost anything youtube_dl supports)"""
         if ctx.voice_client is None:
             if ctx.author.voice:
@@ -139,7 +144,16 @@ class Music:
 
         state = self.get_state(ctx.guild.id)
         async with ctx.typing():
-            player = await YTDLSource.from_query(query, loop=self.bot.loop)
+            if query:
+                player = await YTDLSource.from_query(query, loop=self.bot.loop)
+            elif len(ctx.message.attachments) > 0:
+                try:
+                    file = ctx.message.attachments[0]
+                    await file.save(file.filename)
+                    player = YTDLSource.from_file(file.filename)
+                except Exception as e:
+                    print(e)
+                    return await ctx.send("Could not play file.")
         song = Song(ctx, player)
         await state.queue.put(song)
         await ctx.send(f'Enqueued:\n     {player.title}')
