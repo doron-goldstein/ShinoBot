@@ -104,7 +104,7 @@ class VoiceState:
                 await self.current.ctx.bot.change_presence(game=game)
             await self.current.ctx.send(embed=embed)
             await self.play_next_song.wait()
-            await self.current.ctx.bot.change_presence()
+            await self.current.ctx.bot.change_presence(game=discord.Game(name="m!help"))
 
 
 class Music:
@@ -212,7 +212,8 @@ class Music:
 
 
 bot = commands.Bot(command_prefix="m!",
-                   description='Simple Music Bot')
+                   description='Simple Music Bot',
+                   game=discord.Game(name="m!help"))
 
 
 @bot.event
