@@ -52,6 +52,8 @@ class Music:
         if ctx.author.voice:
             if ctx.author.voice.channel != ctx.voice_client.channel:
                 return await ctx.send(":exclamation: You must be in the same channel as me!")
+        else:
+            return await ctx.send("You must be in the voice channel to skip!")
 
         async with ctx.typing():
             if query:
