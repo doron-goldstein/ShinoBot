@@ -49,6 +49,10 @@ class Music:
             else:
                 return await ctx.send(":exclamation: Not connected to a voice channel.")
 
+        if ctx.author.voice:
+            if ctx.author.voice.channel != ctx.voice_client.channel:
+                return await ctx.send(":exclamation: You must be in the same channel as me!")
+
         async with ctx.typing():
             if query:
                 player = await YTDLSource.from_query(query, loop=self.bot.loop)
