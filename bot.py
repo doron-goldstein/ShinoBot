@@ -42,7 +42,7 @@ class MusicBot(commands.Bot):
     async def on_ready(self):
         print('Logged in as {0.id}/{0}'.format(self.user))
         print('------')
-        self.bot.dev = dev
+        self.dev = dev
         self.load_extension("music")
         self.pool = await asyncpg.create_pool(db, ssl=SSLContext())
         query = """
