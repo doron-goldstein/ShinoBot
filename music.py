@@ -81,6 +81,12 @@ class Music:
         if not ctx.voice_client or not ctx.voice_client.is_playing():
             return await ctx.send("Cannot skip, I'm not playing anything!")
 
+        if ctx.author.voice:
+            if ctx.author.voice.channel != ctx.voice_client.channel:
+                return await ctx.send("You must be in the same channel as me to skip!")
+        else:
+            return await ctx.send("You're not in the voice channel!")
+
         if ctx.author.id in ctx.state.skips:
             await ctx.send("You've voted already!")
         else:
