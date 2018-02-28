@@ -22,6 +22,7 @@ class Music:
             return False
         return commands.check(predicate)
 
+    @master_only()
     @commands.command()
     async def summon(self, ctx):
         """Joins the channel you're currently in"""
@@ -31,6 +32,7 @@ class Music:
             return await ctx.author.voice.channel.connect()
         await ctx.send(":exclamation: You're not connected to a voice channel!")
 
+    @master_only()
     @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel):
         """Joins a voice channel"""
