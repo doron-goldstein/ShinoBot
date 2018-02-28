@@ -184,7 +184,7 @@ class Music:
         """Sets the master role for the server
         The `role` argument can be an ID, name, or mention of a role.
         """
-
+        self.bot.masters[ctx.guild.id] = role.id
         query = """
             INSERT INTO masters (guild_id, role_id)
             VALUES ($1, $2)
