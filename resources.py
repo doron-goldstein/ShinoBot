@@ -69,7 +69,9 @@ class VoiceState:
         self.play_next_song = asyncio.Event()
         self.skips = []
         self.pl_task = self.bot.loop.create_task(self.playlist())
-        self.master = discord.utils.get(self.guild.roles, id=self.bot.masters[self.guild.id])
+        r_id = self.bot.masters[self.guild.id]
+        if r_id:
+            self.master = discord.utils.get(self.guild.roles, id=r_id)
 
     def skip_song(self):
         if len(self.skips) >= (len(self.current.ctx.voice_client.channel.members) - 1) * 0.34:

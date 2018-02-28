@@ -17,7 +17,9 @@ class Music:
 
     def master_only():
         def predicate(ctx):
-            return ctx.state.master in ctx.author.roles
+            if ctx.state.master:
+                return ctx.state.master in ctx.author.roles
+            return False
         return commands.check(predicate)
 
     @commands.command()
@@ -128,8 +130,8 @@ class Music:
                 return await ctx.send("Song number cannot be negative or zero.")
             await ctx.send("Invalid song number. Check the queue for valid numbers.")
 
-        if ctx.state.master not in ctx.author.roles:
-            if s.ctx.author != ctx.author:
+        if ctx.state.master and s.ctx.author != ctx.author:
+            if ctx.state.master not in ctx.author.roles:
                 return await ctx.send("You can only remove songs queued by yourself.")
 
         queue.remove(s)
