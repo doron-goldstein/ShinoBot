@@ -78,6 +78,9 @@ class Music:
     @commands.command()
     async def skip(self, ctx):
         """Votes to skip the current song"""
+        if not ctx.voice_client or not ctx.voice_client.is_playing():
+            return await ctx.send("Cannot skip, I'm not playing anything!")
+
         if ctx.author.id in ctx.state.skips:
             await ctx.send("You've voted already!")
         else:
