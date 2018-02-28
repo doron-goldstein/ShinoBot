@@ -69,7 +69,7 @@ class VoiceState:
         self.play_next_song = asyncio.Event()
         self.skips = []
         self.pl_task = self.bot.loop.create_task(self.playlist())
-        r_id = self.bot.masters[self.guild.id]
+        r_id = self.bot.masters.get(self.guild.id)
         if r_id:
             self.master = discord.utils.get(self.guild.roles, id=r_id)
 
