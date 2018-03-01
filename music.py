@@ -6,7 +6,7 @@ from discord.ext import commands
 from resources import YTDLSource
 from utils.paginator import Pages
 
-Song = namedtuple("Song", "ctx player")
+Song = namedtuple("Song", "ctx player notif")
 
 
 class Music:
@@ -66,7 +66,7 @@ class Music:
                 except Exception as e:
                     print(e)
                     return await ctx.send("Could not play file.")
-        song = Song(ctx, player)
+        song = Song(ctx, player, [])
         await ctx.state.queue.put(song)
         await ctx.send(f'Enqueued:\n     {player.title}')
 
@@ -153,6 +153,21 @@ class Music:
 
         queue.remove(s)
         await ctx.send(f"Removed `{s.player.title}` from the queue.")
+
+    @commands.command()
+    async def notify(self, ctx, n: int):
+        """Pings you when specified song comes on"""
+        queue = ctx.state.queue._queue
+
+        try:
+            s = queue[n - 1]
+        except IndexError:
+            if n < 1:
+                return await ctx.send("Song number cannot be negative or zero.")
+            await ctx.send("Invalid song number. Check the queue for valid numbers.")
+
+        s.notif.append(ctx.author.id)
+        await ctx.send(f"Added you to `{s.player.title}`.")
 
     @master_only()
     @commands.command()

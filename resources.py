@@ -100,7 +100,8 @@ class VoiceState:
             if not self.current.ctx.guild.me.game:
                 game = discord.Game(name=self.current.player.title, type=2)
                 await self.bot.change_presence(game=game)
-            await self.current.ctx.send(embed=embed)
+            fmt = ", ".join(self.bot.get_user(uid).mention for uid in self.current.notif)
+            await self.current.ctx.send(fmt, embed=embed)
             await self.play_next_song.wait()
 
             if self.bot.dev:
