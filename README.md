@@ -6,5 +6,6 @@ Can be run locally by renaming `example.yaml` to `config.yaml` and changing the 
 ```yaml
 token: BOT TOKEN HERE
 ```
+ALSO REQUIRES A DB WITH A "masters" TABLE. JUST INVITE IT
 
 Run using `python bot.py`.
