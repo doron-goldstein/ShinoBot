@@ -71,6 +71,8 @@ class Music:
                 except Exception as e:
                     print(e)
                     return await ctx.send("Could not play file.")
+            else:
+                return await ctx.send("Must specify search query or upload music file.")
         song = Song(ctx, player, [])
         await ctx.state.queue.put(song)
         await ctx.send(f'Enqueued:\n     {player.title}')
