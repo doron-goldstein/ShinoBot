@@ -3,7 +3,7 @@ from collections import namedtuple
 import discord
 from discord.ext import commands
 
-from utils.resources import YTDLSource
+from utils.resources import YTDLSource, get_song_length
 from utils.paginator import Pages
 
 Song = namedtuple("Song", "ctx player notif")
@@ -62,6 +62,11 @@ class Music:
 
         async with ctx.typing():
             if query:
+                max_len = ctx.config['length_max']
+                if max_len and max_len > 0:
+                    length = await get_song_length(query)
+                    if length > max_len:
+                        return await ctx.send(f"Song is too long! Limit is `{max_len}` seconds.")
                 player = await YTDLSource.from_query(query, loop=self.bot.loop)
             elif len(ctx.message.attachments) > 0:
                 try:

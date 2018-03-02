@@ -38,6 +38,7 @@ class MusicContext(commands.Context):
 
 class MusicBot(commands.Bot):
     async def on_message(self, message):
+        await self.wait_until_ready()
         if self.dev:
             if message.guild.id != 246291440106340352:
                 return

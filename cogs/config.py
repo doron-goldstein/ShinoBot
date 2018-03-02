@@ -28,7 +28,7 @@ class Configuration:
     @master_only()
     @commands.command()
     async def locked(self, ctx, typ="Embed"):
-        """List all locked members"""
+        """[M] List all locked members"""
 
         entries = [self.bot.get_user(uid) for uid in ctx.config['locked']]
 

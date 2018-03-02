@@ -31,6 +31,14 @@ ffmpeg_options = {
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
 
+async def get_song_length(query):
+    loop = asyncio.get_event_loop()
+    data = await loop.run_in_executor(None, ytdl.extract_info, query, False)  # get data
+    if 'entries' in data:
+        data = data['entries'][0]
+    return data['duration']
+
+
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=0.5):
         super().__init__(source, volume)
