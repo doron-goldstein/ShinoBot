@@ -3,29 +3,34 @@ from collections import namedtuple
 import discord
 from discord.ext import commands
 
-from resources import YTDLSource
+from utils.resources import YTDLSource
 from utils.paginator import Pages
 
 Song = namedtuple("Song", "ctx player notif")
+
+
+def master_only():
+    def predicate(ctx):
+        if ctx.state.master:
+            return ctx.state.master in ctx.author.roles
+        return False
+    return commands.check(predicate)
 
 
 class Music:
     def __init__(self, bot):
         self.bot = bot
         self.bot.states = {}
-        self.bot.masters = {}
 
-    def master_only():
-        def predicate(ctx):
-            if ctx.state.master:
-                return ctx.state.master in ctx.author.roles
-            return False
-        return commands.check(predicate)
+    def __local_check(self, ctx):
+        if self.bot.config.get(ctx.guild.id) is None:
+            return True
+        return ctx.author.id not in ctx.config['locked']
 
     @master_only()
     @commands.command()
     async def summon(self, ctx):
-        """Joins the channel you're currently in"""
+        """[M] Joins the channel you're currently in"""
         if ctx.author.voice:
             if ctx.voice_client:
                 return await ctx.voice_client.move_to(ctx.author.voice.channel)
@@ -35,7 +40,7 @@ class Music:
     @master_only()
     @commands.command()
     async def join(self, ctx, *, channel: discord.VoiceChannel):
-        """Joins a voice channel"""
+        """[M] Joins a voice channel"""
         if ctx.voice_client is not None:
             return await ctx.voice_client.move_to(channel)
         await channel.connect()
@@ -53,7 +58,7 @@ class Music:
             if ctx.author.voice.channel != ctx.voice_client.channel:
                 return await ctx.send(":exclamation: You must be in the same channel as me!")
         else:
-            return await ctx.send("You must be in the voice channel to skip!")
+            return await ctx.send("You must be in the voice channel to queue songs!")
 
         async with ctx.typing():
             if query:
@@ -172,7 +177,7 @@ class Music:
     @master_only()
     @commands.command()
     async def volume(self, ctx, volume: int):
-        """Changes the player's volume"""
+        """[M] Changes the player's volume"""
 
         if ctx.voice_client is None:
             return await ctx.send("Not connected to a voice channel.")
@@ -183,7 +188,7 @@ class Music:
     @master_only()
     @commands.command()
     async def stop(self, ctx):
-        """Stops and disconnects the bot from voice"""
+        """[M] Stops and disconnects the bot from voice"""
         state = ctx.state
         async with ctx.typing():
             if not state.queue.empty():
@@ -192,22 +197,6 @@ class Music:
 
         await ctx.send("<:blobstop:340118614848045076>")
         await ctx.voice_client.disconnect()
-
-    @commands.has_permissions(administrator=True)
-    @commands.command()
-    async def setmaster(self, ctx, *, role: discord.Role):
-        """Sets the master role for the server
-        The `role` argument can be an ID, name, or mention of a role.
-        """
-        self.bot.masters[ctx.guild.id] = role.id
-        query = """
-            INSERT INTO masters (guild_id, role_id)
-            VALUES ($1, $2)
-                ON CONFLICT (guild_id)
-                DO UPDATE SET role_id = EXCLUDED.role_id
-        """
-        await self.bot.pool.execute(query, ctx.guild.id, role.id)
-        await ctx.message.add_reaction("\N{OK HAND SIGN}")
 
 
 def setup(bot):

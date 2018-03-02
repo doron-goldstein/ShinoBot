@@ -69,9 +69,10 @@ class VoiceState:
         self.play_next_song = asyncio.Event()
         self.skips = []
         self.pl_task = self.bot.loop.create_task(self.playlist())
-        r_id = self.bot.masters.get(self.guild.id)
-        if r_id:
-            self.master = discord.utils.get(self.guild.roles, id=r_id)
+        self.master = None
+        conf = self.bot.config.get(self.guild.id)
+        if conf and conf.get('role_id'):
+            self.master = discord.utils.get(self.guild.roles, id=conf['role_id'])
 
     def skip_song(self):
         if len(self.skips) >= (len(self.current.ctx.voice_client.channel.members) - 1) * 0.34:
@@ -88,20 +89,25 @@ class VoiceState:
         await self.bot.wait_until_ready()
         while not self.bot.is_closed():
             self.play_next_song.clear()
-            try:
-                os.remove(self.current.player.filename)
-            except Exception as e:
-                print(e)
-            self.current = await self.queue.get()
-            self.current.ctx.voice_client.play(self.current.player, after=self.toggle_song)
-            embed = discord.Embed(title="Now playing")
-            embed.add_field(name="Queuer", value=self.current.ctx.author.name, inline=False)
-            embed.add_field(name="Song", value=self.current.player.title, inline=False)
-            if not self.current.ctx.guild.me.game:
-                game = discord.Game(name=self.current.player.title, type=2)
-                await self.bot.change_presence(game=game)
+            if self.current:
+                os.remove(self.current.player.filename)  # delete song after its played
+
+            self.current = await self.queue.get()  # get next song
+            self.ctx = self.current.ctx
+            self.player = self.current.player
+            self.ctx.voice_client.play(self.player, after=self.toggle_song)  # play the song
+
+            embed = discord.Embed(title="Now playing")  # build embed
+            embed.add_field(name="Queuer", value=self.ctx.author.name, inline=False)
+            embed.add_field(name="Song", value=self.player.title, inline=False)
+
+            if not self.ctx.guild.me.game:
+                game = discord.Game(name=self.player.title, type=2)
+                await self.bot.change_presence(game=game)  # set presence to song
+
             fmt = ", ".join(self.bot.get_user(uid).mention for uid in self.current.notif)
-            await self.current.ctx.send(fmt, embed=embed)
+            await self.ctx.send(fmt, embed=embed)
+
             await self.play_next_song.wait()
 
             if self.bot.dev:
