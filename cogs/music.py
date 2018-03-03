@@ -23,7 +23,7 @@ class Music:
         self.bot.states = {}
 
     def __local_check(self, ctx):
-        if self.bot.config.get(ctx.guild.id) is None:
+        if self.bot.config.get(ctx.guild.id)['locked'] is None:
             return True
         return ctx.author.id not in ctx.config['locked']
 
