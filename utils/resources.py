@@ -109,7 +109,7 @@ class VoiceState:
             embed.add_field(name="Queuer", value=self.ctx.author.name, inline=False)
             embed.add_field(name="Song", value=self.player.title, inline=False)
 
-            if not self.ctx.guild.me.game:
+            if self.ctx.guild.me.game.name == "m!help":
                 game = discord.Game(name=self.player.title, type=2)
                 await self.bot.change_presence(game=game)  # set presence to song
 
