@@ -16,7 +16,7 @@ if token is None or db is None:
         cfg = yaml.load(cfg)
         token = cfg["token"]
         db = cfg["DB"]
-        dev = True
+        dev = cfg["dev"]
 
 
 class MusicContext(commands.Context):
@@ -33,6 +33,8 @@ class MusicContext(commands.Context):
 
     @property
     def config(self):
+        if self.bot.config.get(self.guild.id) is None:
+            self.bot.config[self.guild.id] = {'role_id': None, 'songs_max': None, 'length_max': None, 'locked': None}
         return self.bot.config[self.guild.id]
 
 
@@ -50,6 +52,7 @@ class MusicBot(commands.Bot):
 
     async def on_ready(self):
         print('Logged in as {0.id}/{0}'.format(self.user))
+        print('Dev mode state: ' + ('enabled' if dev else 'disabled'))
         print('------')
         self.dev = dev
         self.load_extension("cogs.music")
@@ -72,5 +75,5 @@ class MusicBot(commands.Bot):
 
 
 game = discord.Game(name="m!help") if not dev else None
-bot = MusicBot(command_prefix=["m!", "M!"], description="Music Bot\n[M] indicates master role only.", game=game)
+bot = MusicBot(command_prefix=["m!", "M!"], description="Music Bot\n[M] indicates master role only.", activity=game)
 bot.run(token)
