@@ -80,7 +80,7 @@ class VoiceState:
         self.master = None
         conf = self.bot.config.get(self.guild.id)
         if conf and conf.get('role_id'):
-            self.master = discord.utils.get(self.guild.roles, id=conf['role_id'])
+            self.master = self.guild.get_role(conf['role_id'])
 
     def skip_song(self):
         if len(self.skips) >= (len(self.current.ctx.voice_client.channel.members) - 1) * 0.34:
